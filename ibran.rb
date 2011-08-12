@@ -2,19 +2,27 @@
 
 def ibranify latin
 	# Derive orthography from input
-	pron = latin.dup
-	orth = latin.delete ":"
-	print_change 0, pron, orth
+	@pron = latin.dup
+	@orth = latin.delete ":"
+	print_change 0, @pron, @orth
 
 	# 1: Word-final /m/ -> 0
-	hit_rule =	pron.gsub! /m$/, ''
-							orth.gsub! /m$/, ''
-	print_change 1, pron, orth if hit_rule
+	change 1, {/m$/ => ''}
 	
 	# 2: /mn/ -> /nn/
-	hit_rule = pron.gsub! /mn/, 'nn'
-						 orth.gsub! /mn/, 'nn'
-	print_change 2, pron, orth if hit_rule
+	change 2, {/mn/ => 'nn'}
+end
+
+def change rule, pron_changes, orth_changes = pron_changes
+	hit_phon = pron_changes.keys.inject(nil) do |hit, key|
+		hit ||= @pron.gsub! key, pron_changes[key]
+	end
+
+	hit_orth = orth_changes.keys.inject(nil) do |hit, key|
+		hit ||= @orth.gsub! key, orth_changes[key]
+	end
+
+	print_change rule, @pron, @orth if hit_phon || hit_orth
 end
 
 def print_change rule, pron, orth
