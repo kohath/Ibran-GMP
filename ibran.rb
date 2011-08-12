@@ -1,5 +1,6 @@
 ﻿#!/usr/bin/env ruby
 
+SHORT = '[aeiouy]'
 V = '[aeiouy]:?'
 C = '[bcdfghklmnpqrstxz]'
 
@@ -24,18 +25,25 @@ def ibranify latin
 	# 5: /e/ or /i/ in hiatus in unstressed penult to /j/ |I| (transcribed as |j|)
 	change 5, {/[ei](#{V}#{C}*$)/ => 'j\1'}
 	
-	
+	# 6: V in unstressed penult to 0
+	#    use 'short' because otherwise it's not an unstressed penult
+	change 6, {/#{SHORT}(#{C}?#{V}#{C}*$)/ => '\1'}, {/#{SHORT}(#{C}?#{V}#{C}*$)/ => '\1'}, { :only_if_phon => true }
+		
+	# 7: /tk/ to /tʃ/ |Z|
+	change 7, {/t[ck]/ => 'tʃ'}, {/t[ck]/ => 'z'}
 end
 
-def change rule, pron_changes, orth_changes = pron_changes
+def change rule, pron_changes, orth_changes = pron_changes, options = {}
 	hit_phon = pron_changes.keys.inject(nil) do |hit, key|
 		hit_key = @pron.gsub! key, pron_changes[key]
 		hit ||= hit_key
 	end
 
-	hit_orth = orth_changes.keys.inject(nil) do |hit, key|
-		hit_key = @orth.gsub! key, orth_changes[key]
-		hit ||= hit_key
+	unless options[:only_if_phon] && !hit_phon
+		hit_orth = orth_changes.keys.inject(nil) do |hit, key|
+			hit_key = @orth.gsub! key, orth_changes[key]
+			hit ||= hit_key
+		end
 	end
 
 	print_change rule, @pron, @orth if hit_phon || hit_orth
