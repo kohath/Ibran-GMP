@@ -1,5 +1,8 @@
 ﻿#!/usr/bin/env ruby
 
+V = '[aeiouy]:?'
+C = '[bcdfghklmnpqrstxz]'
+
 def ibranify latin
 	@pron, @orth = latin.dup, latin.dup
 
@@ -15,8 +18,13 @@ def ibranify latin
 	# 3: Word-final /t/ -> 0
 	change 3, {/t$/ => ''}
 	
-	# 4: /h/ to 0 (and unwritten /ph/ -> f)
+	# 4: /h/ to 0 (and unwritten rule of /ph/ -> f)
 	change 4, {/ph/ => 'f', /h/ => ''}
+	
+	# 5: /e/ or /i/ in hiatus in unstressed penult to /j/ |I| (transcribed as |j|)
+	change 5, {/[ei](#{V}#{C}*$)/ => 'j\1'}
+	
+	
 end
 
 def change rule, pron_changes, orth_changes = pron_changes
