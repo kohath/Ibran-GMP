@@ -1,7 +1,5 @@
 ﻿#!/usr/bin/env ruby
 
-ibranify ARGV[0]
-
 def ibranify latin
 	# Derive orthography from input
 	orth = latin.delete ":"
@@ -10,3 +8,5 @@ def ibranify latin
 	# Word-final /m/ -> 0
 	
 end
+
+ibranify ARGV[0]
