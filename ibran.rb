@@ -1,14 +1,29 @@
 ﻿#!/usr/bin/env ruby
 
 SHORT = '[aeiouy]'
+LONG = '[aeiouy]:'
 V = '[aeiouy]:?'
-C = '[bcdfghklmnpqrstxz]'
+C = '[bcdfghklmnpqrsʃtvxz]'
+L = '[lr]'
+HEAVY_PENULT = "#{C}{2,}#{V}#{C}*$"
+LONG_PENULT = ":#{C}?#{V}#{C}*$"
+MONOSYLLABLE = "^#{C}*#{V}#{C}*$"
+DISYLLABLE = "^#{C}*#{V}#{C}*#{V}#{C}*$"
+ANTEPENULT = "#{C}*#{V}#{C}*#{V}#{C}*$"
 
 def ibranify latin
 	@pron, @orth = latin.dup, latin.dup
 
 	# Derive orthography from input
-	change 0, {}, {/:/ => ""}
+	change 0, {/x/ => 'ks', 
+						 /c/ => 'k', 
+						 /qu/ => 'q', 
+						 /(#{C}?#{L}?#{V}#{HEAVY_PENULT})/ => 'ˈ\1',
+						 /(#{C}?#{L}?#{SHORT}#{LONG_PENULT})/ => 'ˈ\1',
+						 /(#{MONOSYLLABLE})/ => 'ˈ\1',
+						 /(#{DISYLLABLE})/ => 'ˈ\1',
+						 /(#{C}?#{L}?#{V}#{ANTEPENULT})/ => 'ˈ\1',
+						 /q/ => 'kʷ', } , {/:/ => ""}
 
 	# 1: Word-final /m/ -> 0
 	change 1, {/m$/ => ''}
@@ -31,6 +46,9 @@ def ibranify latin
 		
 	# 7: /tk/ to /tʃ/ |Z|
 	change 7, {/t[ck]/ => 'tʃ'}, {/t[ck]/ => 'z'}
+	
+	# 8: Stressed vowel changes
+#	change 8, 
 end
 
 def change rule, pron_changes, orth_changes = pron_changes, options = {}
