@@ -1,10 +1,10 @@
 ﻿#!/usr/bin/env ruby
 
 def ibranify latin
+	@pron, @orth = latin.dup, latin.dup
+
 	# Derive orthography from input
-	@pron = latin.dup
-	@orth = latin.delete ":"
-	print_change 0, @pron, @orth
+	change 0, {}, {/:/ => ""}
 
 	# 1: Word-final /m/ -> 0
 	change 1, {/m$/ => ''}
