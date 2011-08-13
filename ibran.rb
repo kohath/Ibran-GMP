@@ -56,25 +56,25 @@ def ibranify latin
 	
 	# 6: V in unstressed penult to 0
 	#    use 'short' because otherwise it's not an unstressed penult
-	change 6, {/#{SHORT}(#{C}?#{V}#{C}*$)/ => '\1'}, {/#{SHORT}(#{C}?#{V}#{C}*$)/ => '\1'}, { :only_if_phon => true }
+	change 6, {/(#{V}.*)#{SHORT}(#{C}?#{V}#{C}*$)/ => '\1\2'}, {/(#{V}.*)#{SHORT}(#{C}?#{V}#{C}*$)/ => '\1\2'}, { :only_if_phon => true }
 		
 	# 7: /tk/ to /tʃ/ |Z|
 	change 7, {/t(ˈ?)[ck]/ => '\1tʃ'}, {/t[ck]/ => 'z'}
 	
 	# 8: Stressed vowel changes
-	# Broken into long and short for ambiguity in orth
+	# Broken into long and short for ambiguity in orth, but both are rule 8 (only one gets called)
 		# SHORT vowels
-	change '8a', {/(ˈ#{C}*)a([^:])/ => '\1ɑ\2',
-							 /(ˈ#{C}*)e([^:])/ => '\1ɛ\2',
-							 /(ˈ#{C}*)i([^:])/ => '\1e\2',
-							 /(ˈ#{C}*)o([^:])/ => '\1ɔ\2',
-							 /(ˈ#{C}*)u([^:])/ => '\1o\2'}, 
+	change 8, {/(ˈ#{C}*)a([^:]|$)/ => '\1ɑ\2',
+							 /(ˈ#{C}*)e([^:]|$)/ => '\1ɛ\2',
+							 /(ˈ#{C}*)i([^:]|$)/ => '\1e\2',
+							 /(ˈ#{C}*)o([^:]|$)/ => '\1ɔ\2',
+							 /(ˈ#{C}*)u([^:]|$)/ => '\1o\2'}, 
 		{ /é/ => 'ę́', 
 		  /í/ => 'ẹ́',
 		  /ó/ => 'ǫ́',
 		  /ú/ => 'ọ́'}, { :only_if_phon => true }
 		# LONG vowels
-	change '8b', {/(ˈ#{C}*)a:/ => '\1ɑ',
+	change 8, {/(ˈ#{C}*)a:/ => '\1ɑ',
 						 /(ˈ#{C}*)(æ:)/ => '\1ɛ',
 						 /(ˈ#{C}*)(e:|œ:)/ => '\1e',
 						 /(ˈ#{C}*)i:/ => '\1i',
@@ -84,6 +84,8 @@ def ibranify latin
 			/é|œ́/ => 'ẹ́',
 			/ó|ǻ/ => 'ọ́'
 		}
+
+	# unstressed vowels
 end
 
 def change rule, pron_changes, orth_changes = pron_changes, options = {}
