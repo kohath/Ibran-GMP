@@ -86,6 +86,7 @@ def ibranify latin
 		}
 
 	# unstressed vowels
+	change 9, {/a/ => 'ɑ', /(œ:|æ:)/ => 'ɛ', /å:/ => 'ɔ'}, {/(œ|æ)/ => 'e', /å/ => 'o'}
 end
 
 def change rule, pron_changes, orth_changes = pron_changes, options = {}
