@@ -1,12 +1,13 @@
 ﻿#!/usr/bin/env ruby
 
 SHORT = '[aeiouy]'
-LONG = '[aeiouyæœå]:'
-V = '[aeiouyæœå]:?'
+LONG = '(ae|oe|au|[aeiouy]:)'
+V = '(ae|oe|au|[aeiouy]:?)'
 C = '[bcdfghklmnpqrsʃtvxz]'
 L = '[lr]'
 HEAVY_PENULT = "#{C}{2,}#{V}#{C}*$"
-LONG_PENULT = ":#{C}?#{V}#{C}*$"
+#LONG_PENULT = ":#{C}?#{V}#{C}*$"
+LIGHT_PENULT = "#{C}?#{V}#{C}*$"
 MONOSYLLABLE = "^#{C}*#{V}#{C}*$"
 DISYLLABLE = "^#{C}*#{V}#{C}*#{V}#{C}*$"
 ANTEPENULT = "#{C}*#{V}#{C}*#{V}#{C}*$"
@@ -16,28 +17,29 @@ def ibranify latin
 
 	# Derive orthography from input
 	change 0, {/x/ => 'ks', 
-						 /ae/ => 'æ:',
-						 /oe/ => 'œ:',
-						 /au/ => 'å:',
+					#	 /ae/ => 'æ:',
+					#	 /oe/ => 'œ:',
+					#	 /au/ => 'å:',
 						 /c/ => 'k', 
 						 /qu/ => 'q', 
+#						 /(#{C}?#{L}?#{V}(#{HEAVY_PENULT}|#{ANTEPENULT})|#{C}?#{L}?#{SHORT}#{LONG_PENULT}|#{MONOSYLLABLE}|#{DISYLLABLE})/ => 'ˈ\1',
 						 /(#{C}?#{L}?#{V}#{HEAVY_PENULT})/ => 'ˈ\1',
-						 /(#{C}?#{L}?#{SHORT}#{LONG_PENULT})/ => 'ˈ\1',
-						 /(#{MONOSYLLABLE})/ => 'ˈ\1',
-						 /(#{DISYLLABLE})/ => 'ˈ\1',
-						 /(#{C}?#{L}?#{V}#{ANTEPENULT})/ => 'ˈ\1',
-						 /q/ => 'kʷ', }, 
+  					 /(#{C}?#{L}?#{LONG}#{LIGHT_PENULT})/ => 'ˈ\1',
+ 						 /(#{C}?#{L}?#{V}#{ANTEPENULT})/ => 'ˈ\1',
+	 					 /(#{MONOSYLLABLE})/ => 'ˈ\1',
+ 						 /(#{DISYLLABLE})/ => 'ˈ\1',
+ 					 /q/ => 'kʷ', }, 
 		{ /qu/ => 'q', 
-						 /(#{C}?#{L}?#{V})(#{HEAVY_PENULT})/ => '\1́\2',
-						 /(#{C}?#{L}?#{SHORT})(#{LONG_PENULT})/ => '\1́\2',
-						 /(^#{C}*#{V})(#{C}*$)/ => '\1́\2',
-						 /(^#{C}*#{V})(#{C}*#{V}#{C}*$)/ => '\1́\2',
-						 /(#{C}?#{L}?#{V})(#{ANTEPENULT})/ => '\1́\2',
+						 /(#{C}?#{L}?#{V})(#{HEAVY_PENULT})/ => '\1́\3',
+						 /(#{C}?#{L}?#{LONG})(#{LIGHT_PENULT})/ => '\1́\3',
+						 /(#{C}?#{L}?#{V})(#{ANTEPENULT})/ => '\1́\3',
+						 /(^#{C}*#{V})(#{C}*$)/ => '\1́\3',
+						 /(^#{C}*#{V})(#{C}*#{V}#{C}*$)/ => '\1́\3',
 						 /q/ => 'qu',
-						 /ae/ => 'æ',
-						 /oe/ => 'œ',
-						 /au/ => 'å',
-						 /:/ => ""}
+					#	 /ae/ => 'æ',
+					#	 /oe/ => 'œ',
+					#	 /au/ => 'å',
+						 /:/ => ''}
 
 	# 1: Word-final /m/ -> 0
 	change 1, {/m$/ => ''}
@@ -56,7 +58,7 @@ def ibranify latin
 	
 	# 6: V in unstressed penult to 0
 	#    use 'short' because otherwise it's not an unstressed penult
-	change 6, {/(#{V}.*)#{SHORT}(#{C}?#{V}#{C}*$)/ => '\1\2'}, {/(#{V}.*)#{SHORT}(#{C}?#{V}#{C}*$)/ => '\1\2'}, { :only_if_phon => true }
+	change 6, {/(#{V}.*)#{SHORT}(#{C}?#{V}#{C}*$)/ => '\1\3'}, {/(#{V}.*)#{SHORT}(#{C}?#{V}#{C}*$)/ => '\1\3'}, { :only_if_phon => true }
 		
 	# 7: /tk/ to /tʃ/ |Z|
 	change 7, {/t(ˈ?)[ck]/ => '\1tʃ'}, {/t[ck]/ => 'z'}
@@ -75,18 +77,18 @@ def ibranify latin
 		  /ú/ => 'ọ́'}, { :only_if_phon => true }
 		# LONG vowels
 	change 8, {/(ˈ#{C}*)a:/ => '\1ɑ',
-						 /(ˈ#{C}*)(æ:)/ => '\1ɛ',
-						 /(ˈ#{C}*)(e:|œ:)/ => '\1e',
+						 /(ˈ#{C}*)(ae)/ => '\1ɛ',
+						 /(ˈ#{C}*)(e:|oe)/ => '\1e',
 						 /(ˈ#{C}*)i:/ => '\1i',
-						 /(ˈ#{C}*)(o:|å:)/ => '\1o',
+						 /(ˈ#{C}*)(o:|au)/ => '\1o',
 						 /(ˈ#{C}*)u:/ => '\1u'},
-		{ /ǽ/ => 'ę́',
-			/é|œ́/ => 'ẹ́',
-			/ó|ǻ/ => 'ọ́'
+		{ /aé/ => 'ę́',
+			/é|oé/ => 'ẹ́',
+			/ó|aú/ => 'ọ́'
 		}
 
 	# unstressed vowels
-	change 9, {/a/ => 'ɑ', /(œ:|æ:)/ => 'ɛ', /å:/ => 'ɔ'}, {/(œ|æ)/ => 'e', /å/ => 'o'}
+	change 9, {/(oe|ae)/ => 'ɛ', /au/ => 'ɔ', /a/ => 'ɑ'}, {/(oe|ae)/ => 'e', /au/ => 'o'}
 end
 
 def change rule, pron_changes, orth_changes = pron_changes, options = {}
